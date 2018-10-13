@@ -22,21 +22,31 @@ public class PlayerManager : MonoBehaviour
     private Rigidbody2D rigidbodyComponent;
     private Animator animator;
     private bool isTouchingWall;
+    private bool isPunching;
+
+    private Transform standardMode;
+    private Transform punchMode;
 
     // Use this for initialization
     void Start()
     {
         rigidbodyComponent = this.GetComponent<Rigidbody2D>();
         animator = this.GetComponent<Animator>();
+        standardMode = this.transform.Find("StandardMode");
+        punchMode = this.transform.Find("PunchMode");
 
         isGrounded = true;
         isTouchingWall = false;
+        isPunching = false;
     }
 
     // Update is called once per frame
     void Update()
     {
         animator.SetBool("IsGrounded", isGrounded);
+        animator.SetBool("IsPunching", isPunching);
+        standardMode.gameObject.SetActive(!isPunching);
+        punchMode.gameObject.SetActive(isPunching);
 
         float currentRunSpeed;
         if (!Input.GetButton("Horizontal"))
@@ -56,6 +66,7 @@ public class PlayerManager : MonoBehaviour
     {
         MovePlayer();
         JumpPlayer();
+        PunchPlayer();
         //  Debug.Log("x:" + rigidbodyComponent.velocity.x + "- y:" + rigidbodyComponent.velocity.y);
 
     }
@@ -123,12 +134,44 @@ public class PlayerManager : MonoBehaviour
         }
     }
 
+    private void PunchPlayer()
+    {
+        if (Input.GetButton("Fire1"))
+        {
+            isPunching = true;
+
+        }
+        else isPunching = false;
+    }
+
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.tag == "Wall")
         {
             isTouchingWall = true;
         }
+        else if (collision.gameObject.tag == "Enemy")
+        {
+
+            //Rigidbody2D rbody = collision.gameObject.GetComponent<Rigidbody2D>();
+            //rbody.velocity = Vector3.zero;
+            //rbody.isKinematic = true;
+            //Debug.Log("Touché3");
+           // https://answers.unity.com/questions/1283208/running-into-enemies-moves-them-how-to-stop-this.html
+        }
+    }
+
+    private void OnCollisionStay2D(Collision2D collision)
+    { 
+        
+        // if (collision.gameObject.tag == "Enemy")
+        //{
+
+        //    Rigidbody2D rbody = collision.gameObject.GetComponent<Rigidbody2D>();
+        //    rbody.velocity = Vector3.zero;
+        //    Debug.Log("stay");
+        //}
+
     }
 
     private void OnCollisionExit2D(Collision2D collision)
@@ -137,6 +180,7 @@ public class PlayerManager : MonoBehaviour
         {
             isTouchingWall = false;
         }
+     
     }
 
 
